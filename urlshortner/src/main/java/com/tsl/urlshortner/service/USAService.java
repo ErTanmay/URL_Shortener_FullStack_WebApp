@@ -55,6 +55,10 @@ public class USAService {
 		
 		String encoded = new String(base62.encode(st.getBytes()));
 		
+//		String shortUrl = createShortUrl(encoded);
+//
+//		log.info("The short url is : {}", shortUrl);
+		
 		log.info("URL Obj and encoded url : {}, {}", save, encoded);
 
 		save.setShortUrl(encoded);
@@ -111,7 +115,7 @@ public class USAService {
 		List<UrlMappingResponseDto> newList = new ArrayList<UrlMappingResponseDto>();
 		
 		for(UrlMapping record : list) {
-			newList.add(new UrlMappingResponseDto(record.getId(), record.getLongUrl(), record.getShortUrl(),
+			newList.add(new UrlMappingResponseDto(record.getId(), record.getLongUrl(), createShortUrl(record.getShortUrl()),
 					record.getClicks()));
 		}
 
