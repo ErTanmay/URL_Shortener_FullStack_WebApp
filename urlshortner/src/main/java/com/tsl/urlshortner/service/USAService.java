@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class USAService {
 	
+	@Value("${spring.redirect.endpoint}")
+	private String endpoint;
 	Base62 base62 = Base62.createInstance();
 	
 	private final UserRepository userRepo;
@@ -82,7 +85,9 @@ public class USAService {
 		}
 		String hostName = inetAddress.getHostName();
 		String ipAddress = inetAddress.getHostAddress();
-		String url = "http://" + ipAddress + ":" + port + "/" + short_url;
+		//String url = "http://" + ipAddress + ":" + port + "/" + short_url;
+		
+		String url = endpoint  + "/" + short_url;
 
 		log.info("The short url is : {}", url);
 		
