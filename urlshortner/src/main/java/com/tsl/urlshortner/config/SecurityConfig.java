@@ -35,11 +35,26 @@ public class SecurityConfig {
 		return config.getAuthenticationManager();
 	}
 	
+//	@Bean
+//	public CorsConfigurationSource corsConfigurationSource() {
+//	    CorsConfiguration config = new CorsConfiguration();
+//
+//	    config.setAllowedOrigins(List.of("*"));
+//	    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//	    config.setAllowedHeaders(List.of("*"));
+//	    config.setAllowCredentials(true);
+//
+//	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//	    source.registerCorsConfiguration("/**", config);
+//
+//	    return source;
+//	}
+	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration config = new CorsConfiguration();
 
-	    config.setAllowedOrigins(List.of("http://localhost:4200"));
+	    config.setAllowedOriginPatterns(List.of("*")); // ✅ allow all origins
 	    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    config.setAllowedHeaders(List.of("*"));
 	    config.setAllowCredentials(true);
@@ -49,7 +64,7 @@ public class SecurityConfig {
 
 	    return source;
 	}
-	
+
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) {
