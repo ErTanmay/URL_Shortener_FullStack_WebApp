@@ -1,0 +1,84 @@
+<div class="container" style="padding: 2rem 1rem; min-height: 100vh;">
+  <div style="max-width: 450px; margin: 0 auto;">
+    <div class="card">
+      <div class="text-center mb-4">
+        <div style="width: 80px; height: 80px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+          <span style="font-size: 2.5rem;">📧</span>
+        </div>
+        <h1 style="margin-bottom: 0.5rem; font-size: 2rem; font-weight: 700;">Verify Your Email</h1>
+        <p style="color: var(--text-secondary);">
+          We've sent a 6-digit code to<br>
+          <strong>{{ email() }}</strong>
+        </p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span>⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <span>✓</span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label">Enter OTP Code</label>
+          <input 
+            type="text" 
+            class="form-control"
+            style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 600;"
+            [class.error]="otpForm.controls['verificationCode'].invalid && otpForm.controls['verificationCode'].touched"
+            formControlName="verificationCode"
+            placeholder="000000"
+            maxlength="6">
+          @if (otpForm.controls['verificationCode'].invalid && otpForm.controls['verificationCode'].touched) {
+            <div class="form-error">
+              @if (otpForm.controls['verificationCode'].errors?.['required']) {
+                <span>OTP code is required</span>
+              }
+              @if (otpForm.controls['verificationCode'].errors?.['pattern']) {
+                <span>Please enter a valid 6-digit code</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          }
+          <span>{{ loading() ? 'Verifying...' : 'Verify Email' }}</span>
+        </button>
+      </form>
+
+      <div class="text-center mt-3">
+        <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+          Didn't receive the code?
+        </p>
+        <button 
+          type="button"
+          class="btn btn-outline btn-sm"
+          (click)="resendOtp()"
+          [disabled]="resendLoading()">
+          @if (resendLoading()) {
+            <span class="spinner"></span>
+          }
+          <span>{{ resendLoading() ? 'Sending...' : 'Resend OTP' }}</span>
+        </button>
+      </div>
+
+      <div class="text-center mt-3">
+        <a routerLink="/register" style="color: var(--text-secondary);">← Back to registration</a>
+      </div>
+    </div>
+  </div>
+</div>

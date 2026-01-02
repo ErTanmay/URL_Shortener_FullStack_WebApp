@@ -1,0 +1,130 @@
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { UrlService } from '../../services/url.service';
+import { UrlShortenerResponse } from '../../models/models';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.css'
+})
+export class DashboardComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private urlService = inject(UrlService);
+  private router = inject(Router);
+
+  urlForm: FormGroup;
+  urls = signal<UrlShortenerResponse[]>([]);
+  loading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
+  currentUser = signal<any>(null);
+  generatingUrl = signal(false);
+  generatedUrl = signal<UrlShortenerResponse | null>(null);
+
+  constructor() {
+    this.urlForm = this.fb.group({
+      longUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.currentUser.set(this.authService.getCurrentUser());
+    this.loadUrls();
+  }
+
+  loadUrls(): void {
+    this.loading.set(true);
+    this.urlService.getAllUrls().subscribe({
+      next: (urls) => {
+        this.urls.set(urls);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load URLs');
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (this.urlForm.invalid) {
+      this.urlForm.controls['longUrl'].markAsTouched();
+      return;
+    }
+
+    this.generatingUrl.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.generatedUrl.set(null);
+
+    this.urlService.generateShortUrl(this.urlForm.value).subscribe({
+      next: (response) => {
+        this.generatingUrl.set(false);
+        this.generatedUrl.set(response);
+        this.successMessage.set('Short URL generated successfully!');
+        this.urlForm.reset();
+        this.loadUrls();
+        
+        setTimeout(() => {
+          this.successMessage.set('');
+        }, 5000);
+      },
+      error: (error) => {
+        this.generatingUrl.set(false);
+        this.errorMessage.set(error.error?.message || 'Failed to generate short URL');
+      }
+    });
+  }
+
+  deleteUrl(id: number): void {
+    if (!confirm('Are you sure you want to delete this URL?')) {
+      return;
+    }
+
+    this.urlService.deleteUrl(id).subscribe({
+      next: () => {
+        this.successMessage.set('URL deleted successfully!');
+        this.loadUrls();
+        
+        setTimeout(() => {
+          this.successMessage.set('');
+        }, 3000);
+      },
+      error: (error) => {
+        this.errorMessage.set('Failed to delete URL');
+      }
+    });
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.successMessage.set('Copied to clipboard!');
+      setTimeout(() => {
+        this.successMessage.set('');
+      }, 2000);
+    });
+  }
+
+  createAnotherUrl(): void {
+    this.generatedUrl.set(null);
+    this.urlForm.reset();
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+}

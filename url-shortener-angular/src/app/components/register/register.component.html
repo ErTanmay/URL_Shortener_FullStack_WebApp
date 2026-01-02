@@ -1,0 +1,166 @@
+<div class="container" style="padding: 2rem 1rem; min-height: 100vh;">
+  <div style="max-width: 500px; margin: 0 auto;">
+    <div class="card">
+      <h1 style="margin-bottom: 0.5rem; font-size: 2rem; font-weight: 700;">Create Account</h1>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Sign up to start shortening URLs</p>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span>⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <span>✓</span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [class.error]="f['fName'].invalid && f['fName'].touched"
+              formControlName="fName"
+              placeholder="John">
+            @if (f['fName'].invalid && f['fName'].touched) {
+              <div class="form-error">
+                @if (f['fName'].errors?.['required']) {
+                  <span>First name is required</span>
+                }
+                @if (f['fName'].errors?.['minlength']) {
+                  <span>Minimum 2 characters required</span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input 
+              type="text" 
+              class="form-control"
+              [class.error]="f['lName'].invalid && f['lName'].touched"
+              formControlName="lName"
+              placeholder="Doe">
+            @if (f['lName'].invalid && f['lName'].touched) {
+              <div class="form-error">
+                @if (f['lName'].errors?.['required']) {
+                  <span>Last name is required</span>
+                }
+                @if (f['lName'].errors?.['minlength']) {
+                  <span>Minimum 2 characters required</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            class="form-control"
+            [class.error]="f['email'].invalid && f['email'].touched"
+            formControlName="email"
+            placeholder="john@example.com">
+          @if (f['email'].invalid && f['email'].touched) {
+            <div class="form-error">
+              @if (f['email'].errors?.['required']) {
+                <span>Email is required</span>
+              }
+              @if (f['email'].errors?.['email']) {
+                <span>Please enter a valid email</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input 
+            type="tel" 
+            class="form-control"
+            [class.error]="f['phone'].invalid && f['phone'].touched"
+            formControlName="phone"
+            placeholder="9876543210">
+          @if (f['phone'].invalid && f['phone'].touched) {
+            <div class="form-error">
+              @if (f['phone'].errors?.['required']) {
+                <span>Phone number is required</span>
+              }
+              @if (f['phone'].errors?.['pattern']) {
+                <span>Please enter a valid 10-digit phone number</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input 
+            type="text" 
+            class="form-control"
+            [class.error]="f['username'].invalid && f['username'].touched"
+            formControlName="username"
+            placeholder="john@2000">
+          @if (f['username'].invalid && f['username'].touched) {
+            <div class="form-error">
+              @if (f['username'].errors?.['required']) {
+                <span>Username is required</span>
+              }
+              @if (f['username'].errors?.['minlength']) {
+                <span>Minimum 4 characters required</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input 
+            type="password" 
+            class="form-control"
+            [class.error]="f['password'].invalid && f['password'].touched"
+            formControlName="password"
+            placeholder="Enter a strong password">
+          @if (f['password'].invalid && f['password'].touched) {
+            <div class="form-error">
+              @if (f['password'].errors?.['required']) {
+                <span>Password is required</span>
+              }
+              @if (f['password'].errors?.['minlength']) {
+                <span>Minimum 8 characters required</span>
+              }
+              @if (f['password'].errors?.['pattern']) {
+                <span>Password must contain uppercase, lowercase, number and special character</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          }
+          <span>{{ loading() ? 'Creating Account...' : 'Create Account' }}</span>
+        </button>
+      </form>
+
+      <div class="text-center mt-3">
+        <p style="color: var(--text-secondary);">
+          Already have an account? 
+          <a routerLink="/login" style="font-weight: 600;">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

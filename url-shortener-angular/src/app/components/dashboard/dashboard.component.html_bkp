@@ -1,0 +1,151 @@
+<div style="min-height: 100vh; background: var(--background);">
+  <header style="background: white; border-bottom: 1px solid var(--border-color); padding: 1rem 0;">
+    <div class="container">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">🔗 URL Shortener</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <span style="color: var(--text-secondary); margin-right: 1rem;">
+            Welcome, <strong>{{ currentUser()?.username }}</strong>
+          </span>
+          <button class="btn btn-outline btn-sm" (click)="goToProfile()">
+            👤 Profile
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="logout()">
+            🚪 Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container" style="padding: 2rem 1rem;">
+    <div class="card mb-4">
+      <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">
+        ✨ Create Short URL
+      </h2>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span>⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <span>✓</span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="urlForm" (ngSubmit)="onSubmit()">
+        <div class="flex gap-2" style="align-items: flex-start;">
+          <div style="flex: 1;">
+            <input 
+              type="url" 
+              class="form-control"
+              [class.error]="urlForm.controls['longUrl'].invalid && urlForm.controls['longUrl'].touched"
+              formControlName="longUrl"
+              placeholder="Enter your long URL here (e.g., https://example.com/very-long-url)">
+            @if (urlForm.controls['longUrl'].invalid && urlForm.controls['longUrl'].touched) {
+              <div class="form-error">
+                @if (urlForm.controls['longUrl'].errors?.['required']) {
+                  <span>URL is required</span>
+                }
+                @if (urlForm.controls['longUrl'].errors?.['pattern']) {
+                  <span>Please enter a valid URL starting with http:// or https://</span>
+                }
+              </div>
+            }
+          </div>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="generatingUrl()"
+            style="white-space: nowrap;">
+            @if (generatingUrl()) {
+              <span class="spinner"></span>
+            }
+            <span>{{ generatingUrl() ? 'Generating...' : '🚀 Shorten URL' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <h2 style="font-size: 1.5rem; font-weight: 700;">
+          📋 Your Short URLs
+        </h2>
+        <span class="badge badge-success">{{ urls().length }} URLs</span>
+      </div>
+
+      @if (loading()) {
+        <div class="text-center" style="padding: 3rem;">
+          <div class="loading-spinner" style="margin: 0 auto;"></div>
+          <p style="color: var(--text-secondary); margin-top: 1rem;">Loading your URLs...</p>
+        </div>
+      }
+
+      @if (!loading() && urls().length === 0) {
+        <div class="text-center" style="padding: 3rem;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🔗</div>
+          <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem;">No URLs yet</h3>
+          <p style="color: var(--text-secondary);">Create your first short URL using the form above!</p>
+        </div>
+      }
+
+      @if (!loading() && urls().length > 0) {
+        <div style="overflow-x: auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Original URL</th>
+                <th>Short URL</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (url of urls(); track url.id) {
+                <tr>
+                  <td style="font-weight: 600;">{{ url.id }}</td>
+                  <td>
+                    <div style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <a [href]="url.longUrl" target="_blank" style="color: var(--primary-color);">
+                        {{ url.longUrl }}
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <code style="background: var(--background); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace;">
+                        {{ url.shortUrl }}
+                      </code>
+                      <button 
+                        class="btn btn-sm btn-outline"
+                        (click)="copyToClipboard(url.shortUrl)"
+                        title="Copy to clipboard">
+                        📋
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteUrl(url.id)"
+                      title="Delete URL">
+                      🗑️ Delete
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>

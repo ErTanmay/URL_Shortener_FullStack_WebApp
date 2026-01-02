@@ -1,0 +1,67 @@
+<div class="container" style="padding: 2rem 1rem; min-height: 100vh;">
+  <div style="max-width: 450px; margin: 0 auto;">
+    <div class="card">
+      <h1 style="margin-bottom: 0.5rem; font-size: 2rem; font-weight: 700;">Welcome To URL Shortener Web App</h1>
+       <h1 style="margin-bottom: 0.2rem; font-size: 1rem; font-weight: 500;">Designed and Developed by Tanmay Lokhande</h1>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Sign in to your account</p>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span>⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input 
+            type="text" 
+            class="form-control"
+            [class.error]="f['username'].invalid && f['username'].touched"
+            formControlName="username"
+            placeholder="Enter your username">
+          @if (f['username'].invalid && f['username'].touched) {
+            <div class="form-error">Username is required</div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input 
+            type="password" 
+            class="form-control"
+            [class.error]="f['password'].invalid && f['password'].touched"
+            formControlName="password"
+            placeholder="Enter your password">
+          @if (f['password'].invalid && f['password'].touched) {
+            <div class="form-error">Password is required</div>
+          }
+        </div>
+
+        <div class="text-right mb-3">
+          <a routerLink="/forgot-password" style="font-size: 0.875rem; font-weight: 600;">
+            Forgot password?
+          </a>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          }
+          <span>{{ loading() ? 'Signing in...' : 'Sign In' }}</span>
+        </button>
+      </form>
+
+      <div class="text-center mt-3">
+        <p style="color: var(--text-secondary);">
+          Don't have an account? 
+          <a routerLink="/register" style="font-weight: 600;">Create one</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
